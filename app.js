@@ -55,6 +55,7 @@ const App = (function () {
         supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
         updateLogoState(true);
         fetchSessionsFromDB();
+        fetchExternalCalendarsFromDB();
       } catch (err) {
         console.warn('Supabase init error, falling back to local storage:', err);
         updateLogoState(false);
@@ -74,6 +75,21 @@ const App = (function () {
       } else {
         logo.classList.add('faint');
       }
+    }
+  }
+
+  // --- Obfuscation Helpers ---
+  function obfuscateString(str) {
+    if (!str) return '';
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function deobfuscateString(str) {
+    if (!str) return '';
+    try {
+      return decodeURIComponent(escape(atob(str)));
+    } catch (e) {
+      return str; // Fallback if not obfuscated
     }
   }
 
@@ -150,6 +166,29 @@ const App = (function () {
     } catch (err) {
       console.warn('DB Fetch failed, using local sessions:', err);
       loadSessionsFromLocal();
+    }
+  }
+
+  async function fetchExternalCalendarsFromDB() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient.from('external_calendars').select('*');
+      if (error) throw error;
+      if (data && data.length > 0) {
+        externalCalendars = data.map(c => ({
+          id: c.id,
+          name: c.name,
+          type: c.type,
+          url: deobfuscateString(c.url),
+          color: c.color,
+          active: c.active
+        }));
+        localStorage.setItem('calmtodo_ext_cals', JSON.stringify(externalCalendars));
+        renderExternalCalendarsList();
+        fetchExternalEvents();
+      }
+    } catch (err) {
+      console.warn('Error fetching calendars from DB', err);
     }
   }
 
@@ -934,7 +973,7 @@ const App = (function () {
   }
 
   // --- Multi-Calendar Sync (Google & Apple) ---
-  function addExternalCalendar(e) {
+  async function addExternalCalendar(e) {
     e.preventDefault();
     const name = document.getElementById('cal-name-input').value.trim();
     const type = document.getElementById('cal-type-input').value;
@@ -955,6 +994,24 @@ const App = (function () {
     localStorage.setItem('calmtodo_ext_cals', JSON.stringify(externalCalendars));
     renderExternalCalendarsList();
     fetchExternalEvents();
+
+    if (supabaseClient) {
+      try {
+        const { data, error } = await supabaseClient.from('external_calendars').insert([{
+          name: newCal.name,
+          type: newCal.type,
+          url: obfuscateString(newCal.url),
+          color: newCal.color,
+          active: newCal.active
+        }]).select().single();
+        if (!error && data) {
+          newCal.id = data.id;
+          localStorage.setItem('calmtodo_ext_cals', JSON.stringify(externalCalendars));
+        }
+      } catch(err) {
+        console.error('Error inserting external calendar', err);
+      }
+    }
 
     document.getElementById('cal-name-input').value = '';
     document.getElementById('cal-url-input').value = '';
@@ -983,11 +1040,19 @@ const App = (function () {
     });
   }
 
-  function deleteExternalCal(id) {
+  async function deleteExternalCal(id) {
     externalCalendars = externalCalendars.filter(c => c.id !== id);
     localStorage.setItem('calmtodo_ext_cals', JSON.stringify(externalCalendars));
     renderExternalCalendarsList();
     renderCalendar();
+
+    if (supabaseClient && !id.startsWith('c-')) {
+      try {
+        await supabaseClient.from('external_calendars').delete().eq('id', id);
+      } catch (err) {
+        console.error('Error deleting external calendar', err);
+      }
+    }
   }
 
   async function fetchExternalEvents() {

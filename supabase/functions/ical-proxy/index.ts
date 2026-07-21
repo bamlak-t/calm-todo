@@ -13,13 +13,21 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const targetUrl = url.searchParams.get("url");
+    let targetUrl = url.searchParams.get("url");
 
     if (!targetUrl) {
       return new Response(JSON.stringify({ error: "Missing 'url' parameter" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    try {
+      if (!targetUrl.startsWith('http') && !targetUrl.startsWith('webcal')) {
+        targetUrl = decodeURIComponent(escape(atob(targetUrl)));
+      }
+    } catch (e) {
+      console.warn("Failed to decode obfuscated URL, using as is", e);
     }
 
     // Fetch the raw iCal file
