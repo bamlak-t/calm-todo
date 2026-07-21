@@ -89,7 +89,7 @@
   <!-- Fixed Bottom Accordion for Todo Items / Sessions -->
   <div class="accordion-wrapper">
     <div class="accordion-container">
-      <div class="accordion-card expanded" id="todo-accordion">
+      <div class="accordion-card" id="todo-accordion">
 
         <!-- Accordion Header Bar -->
         <div class="accordion-header" onclick="App.toggleAccordion()"
@@ -106,13 +106,15 @@
                 title="Create New...">
                 +
               </button>
-              <span class="accordion-toggle" id="accordion-toggle-icon">▼</span>
+              <span class="accordion-toggle" id="accordion-toggle-icon">▲</span>
             </div>
           </div>
 
-          <input type="text" id="session-search-input" class="form-control"
-            style="font-size: 0.8rem; padding: 6px 10px; width: 100%; box-sizing: border-box;"
-            placeholder="Search sessions..." onclick="event.stopPropagation()" onkeyup="App.handleSearch(this.value)" />
+          <div id="search-bar-wrapper">
+            <input type="text" id="session-search-input" class="form-control"
+              style="font-size: 0.8rem; padding: 6px 10px; width: 100%; box-sizing: border-box;"
+              placeholder="Search sessions..." onclick="event.stopPropagation()" onkeyup="App.handleSearch(this.value)" />
+          </div>
 
         </div>
 
@@ -293,6 +295,19 @@
 
       <div style="display: flex; justify-content: flex-end;">
         <button class="btn btn-primary" onclick="App.closeModal('settings-modal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Day Detail Timeline -->
+  <div class="modal-overlay" id="day-detail-modal">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="day-detail-title">Day Detail</h3>
+        <button class="btn btn-sm btn-icon" onclick="App.closeModal('day-detail-modal')">x</button>
+      </div>
+      <div id="day-detail-content" style="max-height: 60vh; overflow-y: auto; padding: 8px 0;">
+        <!-- Dynamically populated -->
       </div>
     </div>
   </div>

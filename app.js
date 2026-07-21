@@ -25,9 +25,9 @@ const App = (function () {
 
   // Category Color Map & Icons (Emojis removed per user request)
   const CATEGORIES = {
-    'food-drink': { name: 'Food / Drink', icon: '', color: 'var(--accent-yellow)' },
-    entertainment: { name: 'Cinema / Show', icon: '', color: 'var(--accent-blue)' },
-    shopping: { name: 'Shopping', icon: '', color: 'var(--accent-orange)' },
+    'food-drink': { name: 'Consume', icon: '', color: 'var(--accent-yellow)' },
+    entertainment: { name: 'Watch', icon: '', color: 'var(--accent-blue)' },
+    shopping: { name: 'Buy', icon: '', color: 'var(--accent-orange)' },
     general: { name: 'General', icon: '', color: '#e5e7eb' }
   };
 
@@ -39,7 +39,6 @@ const App = (function () {
     renderCalendar();
     renderSessions();
     renderExternalCalendarsList();
-    fetchExternalEvents();
   }
 
   function loadSavedSettings() {
@@ -345,6 +344,10 @@ const App = (function () {
           allocateSessionToDate(sessionId, dateStr);
         }
       });
+
+      cell.addEventListener('click', () => {
+        openDayDetail(dateStr);
+      });
     }
 
     const numSpan = document.createElement('span');
@@ -554,10 +557,12 @@ const App = (function () {
           <!-- Add Subevent Form -->
           <form onsubmit="App.handleAddSubEvent(event, '${session.id}')" class="add-subevent-form" style="align-items: center;">
             <input type="text" placeholder="Event description..." class="form-control" style="flex: 2; font-size: 0.8rem;" required />
-            <div class="category-pills" data-selected="general">
-              ${Object.entries(CATEGORIES).map(([key, cat]) => `<button type="button" class="cat-pill ${key === 'general' ? 'active' : ''}" data-cat="${key}" style="--pill-color: ${cat.color}" onclick="App.selectCategoryPill(this)">${cat.name}</button>`).join('')}
+            <div class="pills-time-row">
+              <div class="category-pills" data-selected="general">
+                ${Object.entries(CATEGORIES).map(([key, cat]) => `<button type="button" class="cat-pill ${key === 'general' ? 'active' : ''}" data-cat="${key}" style="--pill-color: ${cat.color}" onclick="App.selectCategoryPill(this)">${cat.name}</button>`).join('')}
+              </div>
+              <input type="time" class="form-control" style="font-size: 0.8rem;" />
             </div>
-            <input type="time" class="form-control" style="font-size: 0.8rem;" required />
             <input type="text" placeholder="Location link..." class="form-control location-input" style="flex: 1; font-size: 0.8rem;" />
             <button type="submit" class="btn btn-sm btn-primary">+ Add</button>
           </form>
@@ -671,7 +676,7 @@ const App = (function () {
         title: document.getElementById('new-event-title').value.trim(),
         category: document.getElementById('new-event-category-pills').dataset.selected || 'general',
         completed: false,
-        event_time: document.getElementById('new-event-time').value ? document.getElementById('new-event-time').value + ':00' : null,
+        event_time: document.getElementById('new-event-time').value ? document.getElementById('new-event-time').value + ':00' : '13:00:00',
         location: document.getElementById('new-event-location').value.trim()
       };
       
@@ -789,7 +794,7 @@ const App = (function () {
         id: 'e-' + Date.now(),
         title: title,
         category: category,
-        event_time: timeInput.value || '',
+        event_time: timeInput.value ? timeInput.value + ':00' : '13:00:00',
         location: locationInput ? locationInput.value.trim() : '',
         completed: false
       });
@@ -961,8 +966,100 @@ const App = (function () {
     const icon = document.getElementById('accordion-toggle-icon');
     if (accordion) {
       const isExpanded = accordion.classList.toggle('expanded');
-      icon.textContent = isExpanded ? '▼' : '▲';
+      icon.textContent = isExpanded ? '\u25BC' : '\u25B2';
     }
+  }
+
+  function openDayDetail(dateStr) {
+    const titleEl = document.getElementById('day-detail-title');
+    const contentEl = document.getElementById('day-detail-content');
+    if (!titleEl || !contentEl) return;
+
+    const dateObj = new Date(dateStr + 'T00:00:00');
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    titleEl.textContent = `${dayNames[dateObj.getDay()]}, ${dateObj.getDate()} ${monthNames[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+
+    let html = '';
+
+    // Gather all events for this date (from allocated sessions)
+    const allocatedSessions = sessions.filter(s => s.allocated_date === dateStr);
+    const allTimelineEvents = [];
+
+    allocatedSessions.forEach(s => {
+      // Add a session header entry
+      if (s.events && s.events.length > 0) {
+        s.events.forEach(ev => {
+          const catInfo = CATEGORIES[ev.category] || CATEGORIES['general'];
+          allTimelineEvents.push({
+            time: ev.event_time ? ev.event_time.substring(0, 5) : '13:00',
+            title: ev.title,
+            group: s.title,
+            category: catInfo.name,
+            catColor: catInfo.color,
+            location: ev.location || '',
+            completed: ev.completed,
+            source: 'internal'
+          });
+        });
+      } else {
+        allTimelineEvents.push({
+          time: '00:00',
+          title: s.title,
+          group: 'Session',
+          category: '',
+          catColor: 'var(--border-color)',
+          location: '',
+          completed: s.completed,
+          source: 'internal'
+        });
+      }
+    });
+
+    // Add external calendar events
+    const extOnDay = externalEvents.filter(e => e.date === dateStr);
+    extOnDay.forEach(ext => {
+      allTimelineEvents.push({
+        time: '',
+        title: ext.summary,
+        group: 'External Calendar',
+        category: ext.source === 'google' ? 'Google' : 'Apple',
+        catColor: ext.source === 'google' ? 'var(--accent-blue)' : 'var(--accent-green)',
+        location: '',
+        completed: false,
+        source: 'external'
+      });
+    });
+
+    // Sort by time
+    allTimelineEvents.sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+
+    if (allTimelineEvents.length === 0) {
+      html = '<p style="text-align: center; color: var(--text-muted); padding: 24px 0; font-size: 0.9rem;">Nothing planned for this day.</p>';
+    } else {
+      html = '<div style="display: flex; flex-direction: column; gap: 2px;">';
+      allTimelineEvents.forEach(ev => {
+        const timeLabel = ev.time || 'All day';
+        const completedStyle = ev.completed ? 'text-decoration: line-through; opacity: 0.6;' : '';
+        const locationLink = ev.location && ev.location.startsWith('http')
+          ? `<a href="${escapeHtml(ev.location)}" target="_blank" style="font-size: 0.75rem; color: var(--accent-blue); text-decoration: none; margin-left: 6px;">Map</a>`
+          : '';
+
+        html += `
+          <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 8px; border-bottom: 1px solid var(--border-color); ${completedStyle}">
+            <div style="min-width: 50px; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--text-muted); padding-top: 2px;">${timeLabel}</div>
+            <div style="width: 4px; min-height: 36px; border-radius: 2px; background: ${ev.catColor}; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-size: 0.9rem; font-weight: 600;">${escapeHtml(ev.title)}${locationLink}</div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">${escapeHtml(ev.group)}${ev.category ? ' - ' + escapeHtml(ev.category) : ''}</div>
+            </div>
+          </div>`;
+      });
+      html += '</div>';
+    }
+
+    contentEl.innerHTML = html;
+    openModal('day-detail-modal');
   }
 
   function selectCategoryPill(btn) {
@@ -1180,6 +1277,7 @@ const App = (function () {
     exportToICS,
     openModal,
     closeModal,
-    toggleDarkMode
+    toggleDarkMode,
+    openDayDetail
   };
 })();

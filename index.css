@@ -12,7 +12,7 @@
   --shadow-sm: 2px 2px 0px #000000;
   --shadow-md: 3px 3px 0px #000000;
   --shadow-lg: 5px 5px 0px #000000;
-  
+
   /* Light mode accents */
   --accent-yellow: #fef08a;
   --accent-blue: #bfdbfe;
@@ -21,7 +21,7 @@
   --accent-orange: #fed7aa;
   --accent-rose: #fecdd3;
   --badge-text: #000000;
-  
+
   --accent-primary: #111827;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -33,11 +33,12 @@ body.dark-mode {
   --panel-bg: #1e1e24;
   --text-color: #f3f4f6;
   --text-muted: #9ca3af;
-  --border-color: #4b5563; /* Softer border for dark mode */
+  --border-color: #4b5563;
+  /* Softer border for dark mode */
   --shadow-sm: 2px 2px 0px #000000;
   --shadow-md: 3px 3px 0px #000000;
   --shadow-lg: 5px 5px 0px #000000;
-  
+
   /* Dark mode muted accents for better contrast with white/light text */
   --accent-yellow: #854d0e;
   --accent-blue: #1e3a8a;
@@ -66,7 +67,11 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, .font-mono {
+h1,
+h2,
+h3,
+h4,
+.font-mono {
   font-family: var(--font-mono);
   font-weight: 700;
 }
@@ -157,6 +162,7 @@ h1, h2, h3, h4, .font-mono {
   background-color: var(--text-color);
   color: var(--panel-bg);
 }
+
 body.dark-mode .btn-primary {
   background-color: var(--text-color);
   color: var(--bg-color);
@@ -196,11 +202,30 @@ body.dark-mode .btn-primary {
   color: var(--badge-text);
 }
 
-.badge-blue { background-color: var(--accent-blue); color: var(--badge-text); }
-.badge-green { background-color: var(--accent-green); color: var(--badge-text); }
-.badge-purple { background-color: var(--accent-purple); color: var(--badge-text); }
-.badge-orange { background-color: var(--accent-orange); color: var(--badge-text); }
-.badge-rose { background-color: var(--accent-rose); color: var(--badge-text); }
+.badge-blue {
+  background-color: var(--accent-blue);
+  color: var(--badge-text);
+}
+
+.badge-green {
+  background-color: var(--accent-green);
+  color: var(--badge-text);
+}
+
+.badge-purple {
+  background-color: var(--accent-purple);
+  color: var(--badge-text);
+}
+
+.badge-orange {
+  background-color: var(--accent-orange);
+  color: var(--badge-text);
+}
+
+.badge-rose {
+  background-color: var(--accent-rose);
+  color: var(--badge-text);
+}
 
 /* Main Container */
 .main-container {
@@ -356,6 +381,7 @@ body.dark-mode .btn-primary {
 .day-events::-webkit-scrollbar {
   width: 3px;
 }
+
 .day-events::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 3px;
@@ -374,7 +400,8 @@ body.dark-mode .btn-primary {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: block; /* Ensure text-overflow works */
+  display: block;
+  /* Ensure text-overflow works */
   width: 100%;
   box-sizing: border-box;
 }
@@ -460,6 +487,10 @@ body.dark-mode .btn-primary {
 .accordion-card.expanded .accordion-body {
   max-height: 60vh;
   padding: 20px;
+}
+
+.accordion-card:not(.expanded) #search-bar-wrapper {
+  display: none;
 }
 
 /* Todo Session Item Card inside Accordion */
@@ -556,7 +587,9 @@ body.dark-mode .btn-primary {
   flex-shrink: 0;
 }
 
-.badge-short { display: none; }
+.badge-short {
+  display: none;
+}
 
 .subevent-checkbox {
   width: 18px;
@@ -608,6 +641,13 @@ body.dark-mode .btn-primary {
   color: var(--badge-text);
   border-color: var(--text-color);
   box-shadow: var(--shadow-sm);
+}
+
+.pills-time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
 /* Forms & Inputs */
@@ -679,50 +719,165 @@ body.dark-mode .btn-primary {
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-  .site-header { padding: 10px 16px; }
-  .header-actions { flex-wrap: wrap; }
-  .main-container { padding: 10px; }
-  
-  .calendar-table-wrapper { 
-    overflow-x: auto; 
+  .site-header {
+    padding: 10px 16px;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
+  .main-container {
+    padding: 10px;
+  }
+
+  .calendar-table-wrapper {
+    overflow-x: auto;
     overflow-y: hidden;
-    margin: 0 -10px; /* pull edge-to-edge if needed, or just let it scroll */
+    margin: 0 -10px;
+    /* pull edge-to-edge if needed, or just let it scroll */
     padding: 0 10px;
-    padding-bottom: 8px; /* Room for scrollbar */
-  }
-  
-  .calendar-grid, .calendar-weekdays {
-    min-width: 600px; /* Force horizontal scroll */
+    padding-bottom: 8px;
+    /* Room for scrollbar */
   }
 
-  .calendar-day { 
+  .calendar-grid,
+  .calendar-weekdays {
+    min-width: 600px;
+    /* Force horizontal scroll */
+  }
+
+  .calendar-day {
     min-height: 80px;
-    padding: 4px; 
+    padding: 4px;
   }
-  .calendar-weekdays { font-size: 0.75rem; gap: 4px; }
-  .calendar-grid { gap: 4px; }
-  .day-number { font-size: 0.8rem; width: 20px; height: 20px; }
-  
-  .accordion-container { padding: 0; }
-  
-  .badge-full { display: none; }
-  .badge-short { display: inline; }
-  .category-badge { min-width: auto !important; padding: 2px 6px; }
 
-  .calendar-settings-form { flex-direction: column !important; }
-  .calendar-settings-form > * { width: 100%; box-sizing: border-box; }
+  .calendar-weekdays {
+    font-size: 0.75rem;
+    gap: 4px;
+  }
 
-  .accordion-card { border-radius: 0; border-left: none; border-right: none; }
-  .accordion-card.expanded .accordion-body { max-height: 70vh; padding: 12px; }
-  .accordion-header { padding: 10px 14px; }
-  .session-card { padding: 10px; }
-  .session-header-row { gap: 8px; flex-direction: column; align-items: flex-start; }
-  .session-actions { width: 100%; justify-content: flex-start; }
-  .btn { padding: 6px 10px; font-size: 0.8rem; }
-  
-  .day-events { max-height: 60px; }
-  .event-chip { font-size: 0.65rem; padding: 2px 4px; }
+  .calendar-grid {
+    gap: 4px;
+  }
 
-  .add-subevent-form { flex-direction: column; }
-  .add-subevent-form .form-control { width: 100%; }
+  .day-number {
+    font-size: 0.8rem;
+    width: 20px;
+    height: 20px;
+  }
+
+  .accordion-container {
+    padding: 0;
+  }
+
+  .badge-full {
+    display: none;
+  }
+
+  .badge-short {
+    display: inline;
+  }
+
+  .category-badge {
+    min-width: auto !important;
+    padding: 2px 6px;
+  }
+
+  .subevent-left .badge:not(.category-badge) {
+    min-width: 40px;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 2px 4px;
+    font-size: 0.6rem;
+  }
+
+  .calendar-settings-form {
+    flex-direction: column !important;
+  }
+
+  .calendar-settings-form>* {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .accordion-card {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  .accordion-card.expanded .accordion-body {
+    max-height: 70vh;
+    padding: 12px;
+  }
+
+  .accordion-header {
+    padding: 10px 14px;
+  }
+
+  .session-card {
+    padding: 10px;
+  }
+
+  .session-header-row {
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .session-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .day-events {
+    max-height: 60px;
+  }
+
+  .event-chip {
+    font-size: 0.65rem;
+    padding: 2px 4px;
+  }
+
+  .add-subevent-form {
+    flex-direction: column;
+  }
+
+  .add-subevent-form .form-control {
+    width: 100%;
+  }
+
+  .pills-time-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .pills-time-row .category-pills {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .pills-time-row .category-pills .cat-pill {
+    font-size: 0.65rem;
+    padding: 3px 6px;
+    text-align: center;
+  }
+
+  .pills-time-row input[type="time"] {
+    width: auto;
+    min-width: 0;
+    flex-shrink: 0;
+  }
 }
