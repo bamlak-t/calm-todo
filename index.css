@@ -840,11 +840,18 @@ body.dark-mode .btn-primary {
 
   .day-events {
     max-height: 60px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .day-events::-webkit-scrollbar {
+    display: none;
   }
 
   .event-chip {
     font-size: 0.65rem;
     padding: 2px 4px;
+    flex-shrink: 0;
+    min-height: 20px;
   }
 
   .add-subevent-form {
