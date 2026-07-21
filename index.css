@@ -277,7 +277,7 @@ body.dark-mode .btn-primary {
 /* Weekday Labels */
 .calendar-weekdays {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
   margin-bottom: 8px;
   text-align: center;
@@ -290,7 +290,7 @@ body.dark-mode .btn-primary {
 /* Calendar Grid */
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -374,10 +374,16 @@ body.dark-mode .btn-primary {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+  display: block; /* Ensure text-overflow works */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.event-chip span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .event-chip.external-event {
@@ -538,7 +544,19 @@ body.dark-mode .btn-primary {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
+
+.subevent-left .badge {
+  min-width: 110px;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.badge-short { display: none; }
 
 .subevent-checkbox {
   width: 18px;
@@ -558,6 +576,38 @@ body.dark-mode .btn-primary {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+/* Category Pill Buttons */
+.category-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cat-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--panel-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.cat-pill:hover {
+  background: var(--bg-color);
+}
+
+.cat-pill.active {
+  background: var(--pill-color, var(--accent-yellow));
+  color: var(--badge-text);
+  border-color: var(--text-color);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Forms & Inputs */
@@ -632,22 +682,47 @@ body.dark-mode .btn-primary {
   .site-header { padding: 10px 16px; }
   .header-actions { flex-wrap: wrap; }
   .main-container { padding: 10px; }
-  .calendar-section { padding: 10px; }
   
+  .calendar-table-wrapper { 
+    overflow-x: auto; 
+    overflow-y: hidden;
+    margin: 0 -10px; /* pull edge-to-edge if needed, or just let it scroll */
+    padding: 0 10px;
+    padding-bottom: 8px; /* Room for scrollbar */
+  }
+  
+  .calendar-grid, .calendar-weekdays {
+    min-width: 600px; /* Force horizontal scroll */
+  }
+
   .calendar-day { 
-    min-height: 80px; /* smaller for mobile */
+    min-height: 80px;
     padding: 4px; 
   }
   .calendar-weekdays { font-size: 0.75rem; gap: 4px; }
   .calendar-grid { gap: 4px; }
   .day-number { font-size: 0.8rem; width: 20px; height: 20px; }
   
+  .accordion-container { padding: 0; }
+  
+  .badge-full { display: none; }
+  .badge-short { display: inline; }
+  .category-badge { min-width: auto !important; padding: 2px 6px; }
+
+  .calendar-settings-form { flex-direction: column !important; }
+  .calendar-settings-form > * { width: 100%; box-sizing: border-box; }
+
+  .accordion-card { border-radius: 0; border-left: none; border-right: none; }
   .accordion-card.expanded .accordion-body { max-height: 70vh; padding: 12px; }
   .accordion-header { padding: 10px 14px; }
   .session-card { padding: 10px; }
-  .session-header-row { gap: 8px; }
+  .session-header-row { gap: 8px; flex-direction: column; align-items: flex-start; }
+  .session-actions { width: 100%; justify-content: flex-start; }
   .btn { padding: 6px 10px; font-size: 0.8rem; }
   
   .day-events { max-height: 60px; }
   .event-chip { font-size: 0.65rem; padding: 2px 4px; }
+
+  .add-subevent-form { flex-direction: column; }
+  .add-subevent-form .form-control { width: 100%; }
 }

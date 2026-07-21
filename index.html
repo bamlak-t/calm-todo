@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CalmTodo</title>
-  <meta name="description" content="A simple, clean todo list app backed by Supabase with multi-calendar sync, session rankings, and a fixed accordion calendar view." />
+  <meta name="description"
+    content="A simple, clean todo list app backed by Supabase with multi-calendar sync, session rankings, and a fixed accordion calendar view." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="index.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body class="light-mode">
 
   <!-- Header -->
@@ -21,11 +26,16 @@
       </div>
 
       <div class="header-actions">
-        <button class="btn btn-accent" onclick="App.openModal('new-session-modal')">
-          + New Session
+        <button class="btn btn-accent" onclick="App.openModal('new-session-modal')" title="New Session">
+          +
         </button>
         <button class="btn btn-icon" onclick="App.openModal('settings-modal')" title="Settings">
-          Settings
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
         </button>
       </div>
     </div>
@@ -33,20 +43,20 @@
 
   <!-- Main View Area -->
   <main class="main-container">
-    
+
     <!-- Calendar View Section -->
     <section class="calendar-section">
       <div class="calendar-header">
         <div class="calendar-title-group">
           <h2 class="current-month-text" id="month-year-label">July 2026</h2>
-          <div class="badge badge-rank" id="calendar-info-badge">Drag & Drop Sessions onto Days</div>
+
         </div>
 
         <div class="calendar-controls">
           <button class="btn btn-sm" onclick="App.navigateMonth(-1)">Prev</button>
           <button class="btn btn-sm btn-primary" onclick="App.jumpToToday()">Today</button>
           <button class="btn btn-sm" onclick="App.navigateMonth(1)">Next</button>
-          
+
           <div class="view-controls">
             <button class="view-btn active" id="view-month-btn" onclick="App.setCalendarView('month')">Month</button>
             <button class="view-btn" id="view-week-btn" onclick="App.setCalendarView('week')">Week</button>
@@ -54,20 +64,23 @@
         </div>
       </div>
 
-      <!-- Calendar Weekday Headers -->
-      <div class="calendar-weekdays">
-        <div>MON</div>
-        <div>TUE</div>
-        <div>WED</div>
-        <div>THU</div>
-        <div>FRI</div>
-        <div>SAT</div>
-        <div>SUN</div>
-      </div>
+      <!-- Calendar Wrapper for Mobile Scroll -->
+      <div class="calendar-table-wrapper">
+        <!-- Calendar Weekday Headers -->
+        <div class="calendar-weekdays">
+          <div>MON</div>
+          <div>TUE</div>
+          <div>WED</div>
+          <div>THU</div>
+          <div>FRI</div>
+          <div>SAT</div>
+          <div>SUN</div>
+        </div>
 
-      <!-- Interactive Calendar Grid -->
-      <div class="calendar-grid" id="calendar-grid">
-        <!-- Calendar days dynamically rendered here -->
+        <!-- Interactive Calendar Grid -->
+        <div class="calendar-grid" id="calendar-grid">
+          <!-- Calendar days dynamically rendered here -->
+        </div>
       </div>
     </section>
 
@@ -77,28 +90,42 @@
   <div class="accordion-wrapper">
     <div class="accordion-container">
       <div class="accordion-card expanded" id="todo-accordion">
-        
+
         <!-- Accordion Header Bar -->
-        <div class="accordion-header" onclick="App.toggleAccordion()">
-          <div class="accordion-title-group">
-            <h3 class="accordion-title">Todo Sessions & Rank Pool</h3>
-            <span class="badge badge-rank" id="pending-count-badge">0 Pending</span>
+        <div class="accordion-header" onclick="App.toggleAccordion()"
+          style="flex-direction: column; align-items: stretch; gap: 8px;">
+
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="accordion-title-group" style="display: flex; align-items: center; gap: 12px;">
+              <h3 class="accordion-title">Todo</h3>
+              <span class="badge badge-rank" id="pending-count-badge">0 Pending</span>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="btn btn-sm btn-accent"
+                onclick="event.stopPropagation(); App.openModal('new-session-modal')" title="New Session">
+                +
+              </button>
+              <span class="accordion-toggle" id="accordion-toggle-icon">▼</span>
+            </div>
           </div>
 
-          <div style="display: flex; gap: 10px; align-items: center;">
-            <button class="btn btn-sm btn-accent" onclick="event.stopPropagation(); App.openModal('new-session-modal')">
-              + New Session
-            </button>
-            <button class="btn btn-icon btn-sm" id="accordion-toggle-icon" style="font-weight: 800;">
-              ▼
-            </button>
-          </div>
+          <input type="text" id="session-search-input" class="form-control"
+            style="font-size: 0.8rem; padding: 6px 10px; width: 100%; box-sizing: border-box;"
+            placeholder="Search sessions..." onclick="event.stopPropagation()" onkeyup="App.handleSearch(this.value)" />
+
         </div>
 
         <!-- Accordion Body: Ranked Todo Sessions List -->
         <div class="accordion-body">
           <div class="session-list" id="session-list-container">
             <!-- Session cards rendered dynamically here -->
+          </div>
+          <div id="pagination-controls"
+            style="display: flex; justify-content: center; gap: 12px; margin-top: 16px; align-items: center;">
+            <button class="btn btn-sm" onclick="App.changePage(-1)" id="btn-prev-page">Prev</button>
+            <span id="page-indicator" style="font-size: 0.8rem; font-family: var(--font-mono);">Page 1 of 1</span>
+            <button class="btn btn-sm" onclick="App.changePage(1)" id="btn-next-page">Next</button>
           </div>
         </div>
 
@@ -118,24 +145,35 @@
         <input type="hidden" id="form-session-id" value="" />
 
         <div style="margin-bottom: 12px;">
-          <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session Title (Grouping)</label>
-          <input type="text" id="form-session-title" class="form-control" style="width: 100%;" placeholder="e.g. Friday Date Night / Project Sprint" required />
+          <label
+            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session
+            Title (Grouping)</label>
+          <input type="text" id="form-session-title" class="form-control" style="width: 100%;"
+            placeholder="Group name..." required />
         </div>
 
         <div style="display: flex; gap: 12px; margin-bottom: 12px;">
           <div style="flex: 1;">
-            <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Priority Rank (#)</label>
-            <input type="number" id="form-session-rank" class="form-control" style="width: 100%;" min="1" value="1" required />
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Priority
+              Rank (#)</label>
+            <input type="number" id="form-session-rank" class="form-control" style="width: 100%;" min="1" value="1"
+              required />
           </div>
           <div style="flex: 1;">
-            <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Allocate Date</label>
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Allocate
+              Date</label>
             <input type="date" id="form-session-date" class="form-control" style="width: 100%;" />
           </div>
         </div>
 
         <div style="margin-bottom: 16px;">
-          <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session Notes (Optional)</label>
-          <textarea id="form-session-notes" class="form-control" style="width: 100%; height: 60px;" placeholder="Add location details or general comments..."></textarea>
+          <label
+            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session
+            Notes (Optional)</label>
+          <textarea id="form-session-notes" class="form-control" style="width: 100%; height: 60px;"
+            placeholder="Add location details or general comments..."></textarea>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px;">
@@ -155,39 +193,47 @@
       </div>
 
       <div style="margin-bottom: 24px;">
-        <h4 style="font-size: 1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Appearance</h4>
+        <h4
+          style="font-size: 1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+          Appearance</h4>
         <button class="btn" id="theme-toggle-btn" onclick="App.toggleDarkMode()">
           Toggle Dark Mode
         </button>
       </div>
 
       <div style="margin-bottom: 16px;">
-        <h4 style="font-size: 1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Google & Apple Calendar Integration</h4>
+        <h4
+          style="font-size: 1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+          Calendar Integration</h4>
         <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 12px;">
-          Connect your Google Calendar or Apple iCloud Calendar by pasting your public <code>.ics</code> or iCal feed link below.
+          Add private <code>.ics</code> or iCal feed links below.
         </p>
 
-        <form onsubmit="App.addExternalCalendar(event)" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-          <input type="text" id="cal-name-input" class="form-control" style="flex: 1; min-width: 140px;" placeholder="Calendar Name (e.g. Work)" required />
+        <form onsubmit="App.addExternalCalendar(event)" class="calendar-settings-form"
+          style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+          <input type="text" id="cal-name-input" class="form-control" style="flex: 1; min-width: 140px;"
+            placeholder="Calendar Name (e.g. Work)" required />
           <select id="cal-type-input" class="form-control">
             <option value="google">Google Cal</option>
             <option value="apple">Apple Cal</option>
           </select>
-          <input type="url" id="cal-url-input" class="form-control" style="flex: 2; min-width: 200px;" placeholder="https://... / webcal://..." required />
+          <input type="url" id="cal-url-input" class="form-control" style="flex: 2; min-width: 200px;"
+            placeholder="https://... / webcal://..." required />
           <button type="submit" class="btn btn-accent">+ Connect</button>
         </form>
 
         <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Connected Calendars:</h4>
-        <div id="external-calendars-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; margin-bottom: 16px;">
+        <div id="external-calendars-list"
+          style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; margin-bottom: 16px;">
           <!-- Rendered dynamically -->
         </div>
 
-        <hr style="border: none; border-top: 1.5px dashed var(--border-color); margin: 16px 0;" />
+        <!-- <hr style="border: none; border-top: 1.5px dashed var(--border-color); margin: 16px 0;" /> -->
 
-        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Export Allocated Sessions:</h4>
+        <!-- <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Export Allocated Sessions:</h4>
         <div style="display: flex; gap: 8px;">
           <button class="btn" onclick="App.exportToICS()">Download Apple/iCal .ics File</button>
-        </div>
+        </div> -->
       </div>
 
       <div style="display: flex; justify-content: flex-end;">
@@ -196,6 +242,84 @@
     </div>
   </div>
 
+  <!-- Modal: Edit Subevent -->
+  <div class="modal-overlay" id="edit-subevent-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Event</h3>
+        <button class="btn btn-sm btn-icon" onclick="App.closeModal('edit-subevent-modal')">✕</button>
+      </div>
+      <form onsubmit="App.saveSubEventForm(event)">
+        <input type="hidden" id="edit-subevent-session-id" />
+        <input type="hidden" id="edit-subevent-id" />
+
+        <div style="margin-bottom: 12px;">
+          <label
+            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Description</label>
+          <input type="text" id="edit-subevent-title" class="form-control" style="width: 100%;" required />
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label
+            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Category</label>
+          <div class="category-pills" id="edit-subevent-category" data-selected="general">
+            <!-- Dynamically populated in JS -->
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Time</label>
+            <input type="time" id="edit-subevent-time" class="form-control" style="width: 100%;" required />
+          </div>
+          <div style="flex: 2;">
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Location
+              Link</label>
+            <input type="text" id="edit-subevent-location" class="form-control" style="width: 100%;"
+              placeholder="https://..." />
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" class="btn" onclick="App.closeModal('edit-subevent-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Move Subevent -->
+  <div class="modal-overlay" id="move-subevent-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Move Event</h3>
+        <button class="btn btn-sm btn-icon" onclick="App.closeModal('move-subevent-modal')">✕</button>
+      </div>
+      <form onsubmit="App.saveMoveSubEvent(event)">
+        <input type="hidden" id="move-subevent-session-id" />
+        <input type="hidden" id="move-subevent-id" />
+
+        <div style="margin-bottom: 16px;">
+          <label
+            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">Select
+            Destination Session:</label>
+          <div id="move-subevent-options"
+            style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" class="btn" onclick="App.closeModal('move-subevent-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Move</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
+
 </html>
