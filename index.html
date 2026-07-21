@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CalmTodo</title>
+  <meta name="description" content="A simple, clean todo list app backed by Supabase with multi-calendar sync, session rankings, and a fixed accordion calendar view." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="light-mode">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-group">
+        <div class="logo-badge" id="app-title-logo">CALM TODO</div>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn btn-accent" onclick="App.openModal('new-session-modal')">
+          + New Session
+        </button>
+        <button class="btn btn-icon" onclick="App.openModal('settings-modal')" title="Settings">
+          Settings
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main class="main-container">
+    
+    <!-- Calendar View Section -->
+    <section class="calendar-section">
+      <div class="calendar-header">
+        <div class="calendar-title-group">
+          <h2 class="current-month-text" id="month-year-label">July 2026</h2>
+          <div class="badge badge-rank" id="calendar-info-badge">Drag & Drop Sessions onto Days</div>
+        </div>
+
+        <div class="calendar-controls">
+          <button class="btn btn-sm" onclick="App.navigateMonth(-1)">Prev</button>
+          <button class="btn btn-sm btn-primary" onclick="App.jumpToToday()">Today</button>
+          <button class="btn btn-sm" onclick="App.navigateMonth(1)">Next</button>
+          
+          <div class="view-controls">
+            <button class="view-btn active" id="view-month-btn" onclick="App.setCalendarView('month')">Month</button>
+            <button class="view-btn" id="view-week-btn" onclick="App.setCalendarView('week')">Week</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendar Weekday Headers -->
+      <div class="calendar-weekdays">
+        <div>MON</div>
+        <div>TUE</div>
+        <div>WED</div>
+        <div>THU</div>
+        <div>FRI</div>
+        <div>SAT</div>
+        <div>SUN</div>
+      </div>
+
+      <!-- Interactive Calendar Grid -->
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- Calendar days dynamically rendered here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Fixed Bottom Accordion for Todo Items / Sessions -->
+  <div class="accordion-wrapper">
+    <div class="accordion-container">
+      <div class="accordion-card expanded" id="todo-accordion">
+        
+        <!-- Accordion Header Bar -->
+        <div class="accordion-header" onclick="App.toggleAccordion()">
+          <div class="accordion-title-group">
+            <h3 class="accordion-title">Todo Sessions & Rank Pool</h3>
+            <span class="badge badge-rank" id="pending-count-badge">0 Pending</span>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn btn-sm btn-accent" onclick="event.stopPropagation(); App.openModal('new-session-modal')">
+              + New Session
+            </button>
+            <button class="btn btn-icon btn-sm" id="accordion-toggle-icon" style="font-weight: 800;">
+              ▼
+            </button>
+          </div>
+        </div>
+
+        <!-- Accordion Body: Ranked Todo Sessions List -->
+        <div class="accordion-body">
+          <div class="session-list" id="session-list-container">
+            <!-- Session cards rendered dynamically here -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create / Edit Session -->
+  <div class="modal-overlay" id="new-session-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="session-modal-title">New Todo Session</h3>
+        <button class="btn btn-sm btn-icon" onclick="App.closeModal('new-session-modal')">✕</button>
+      </div>
+
+      <form onsubmit="App.saveSessionForm(event)">
+        <input type="hidden" id="form-session-id" value="" />
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session Title (Grouping)</label>
+          <input type="text" id="form-session-title" class="form-control" style="width: 100%;" placeholder="e.g. Friday Date Night / Project Sprint" required />
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div style="flex: 1;">
+            <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Priority Rank (#)</label>
+            <input type="number" id="form-session-rank" class="form-control" style="width: 100%;" min="1" value="1" required />
+          </div>
+          <div style="flex: 1;">
+            <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Allocate Date</label>
+            <input type="date" id="form-session-date" class="form-control" style="width: 100%;" />
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session Notes (Optional)</label>
+          <textarea id="form-session-notes" class="form-control" style="width: 100%; height: 60px;" placeholder="Add location details or general comments..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+          <button type="button" class="btn" onclick="App.closeModal('new-session-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Session</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Settings (Dark Mode & Calendars) -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Settings</h3>
+        <button class="btn btn-sm btn-icon" onclick="App.closeModal('settings-modal')">✕</button>
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <h4 style="font-size: 1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Appearance</h4>
+        <button class="btn" id="theme-toggle-btn" onclick="App.toggleDarkMode()">
+          Toggle Dark Mode
+        </button>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <h4 style="font-size: 1rem; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">Google & Apple Calendar Integration</h4>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 12px;">
+          Connect your Google Calendar or Apple iCloud Calendar by pasting your public <code>.ics</code> or iCal feed link below.
+        </p>
+
+        <form onsubmit="App.addExternalCalendar(event)" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+          <input type="text" id="cal-name-input" class="form-control" style="flex: 1; min-width: 140px;" placeholder="Calendar Name (e.g. Work)" required />
+          <select id="cal-type-input" class="form-control">
+            <option value="google">Google Cal</option>
+            <option value="apple">Apple Cal</option>
+          </select>
+          <input type="url" id="cal-url-input" class="form-control" style="flex: 2; min-width: 200px;" placeholder="https://... / webcal://..." required />
+          <button type="submit" class="btn btn-accent">+ Connect</button>
+        </form>
+
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Connected Calendars:</h4>
+        <div id="external-calendars-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto; margin-bottom: 16px;">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <hr style="border: none; border-top: 1.5px dashed var(--border-color); margin: 16px 0;" />
+
+        <h4 style="font-size: 0.9rem; margin-bottom: 8px;">Export Allocated Sessions:</h4>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn" onclick="App.exportToICS()">Download Apple/iCal .ics File</button>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="App.closeModal('settings-modal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
