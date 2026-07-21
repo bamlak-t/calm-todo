@@ -566,9 +566,87 @@ const App = (function () {
     }
   }
 
+  function toggleNewItemType() {
+    const type = document.querySelector('input[name="new_item_type"]:checked').value;
+    if (type === 'session') {
+      document.getElementById('new-session-fields').style.display = 'block';
+      document.getElementById('new-event-fields').style.display = 'none';
+      document.getElementById('btn-save-new-item').textContent = 'Save Session';
+      document.getElementById('form-session-title').required = true;
+      document.getElementById('new-event-title').required = false;
+    } else {
+      document.getElementById('new-session-fields').style.display = 'none';
+      document.getElementById('new-event-fields').style.display = 'block';
+      document.getElementById('btn-save-new-item').textContent = 'Save Event';
+      document.getElementById('form-session-title').required = false;
+      document.getElementById('new-event-title').required = true;
+    }
+  }
+
+  function openNewItemModal() {
+    document.getElementById('form-session-id').value = '';
+    document.getElementById('form-session-title').value = '';
+    document.getElementById('form-session-rank').value = '1';
+    document.getElementById('form-session-date').value = '';
+    document.getElementById('form-session-notes').value = '';
+    
+    document.getElementById('new-event-title').value = '';
+    document.getElementById('new-event-time').value = '';
+    document.getElementById('new-event-location').value = '';
+    
+    document.getElementById('session-modal-title').textContent = 'Create New...';
+    document.getElementById('new-item-type-toggle').style.display = 'flex';
+    document.querySelector('input[name="new_item_type"][value="event"]').checked = true;
+    
+    // Populate dropdown
+    const select = document.getElementById('new-event-target-session');
+    select.innerHTML = sessions.map(s => `<option value="${s.id}">${escapeHtml(s.title)}</option>`).join('');
+    const inbox = sessions.find(s => s.title === 'Inbox (Unplanned)');
+    if (inbox) select.value = inbox.id;
+
+    // Populate category pills
+    const catContainer = document.getElementById('new-event-category-pills');
+    catContainer.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) =>
+      `<button type="button" class="cat-pill ${key === 'general' ? 'active' : ''}" data-cat="${key}" onclick="App.selectCategoryPill(this)" style="background-color: ${cat.color}">
+         ${cat.icon ? cat.icon + ' ' : ''}${cat.name}
+       </button>`
+    ).join('');
+    catContainer.dataset.selected = 'general';
+
+    toggleNewItemType();
+    openModal('new-session-modal');
+  }
+
   function saveSessionForm(e) {
     e.preventDefault();
     const id = document.getElementById('form-session-id').value;
+    const type = document.querySelector('input[name="new_item_type"]:checked').value;
+
+    if (type === 'event' && !id) {
+      const targetSessionId = document.getElementById('new-event-target-session').value;
+      const targetSession = sessions.find(s => s.id === targetSessionId);
+      if (!targetSession) return;
+      
+      const newEvent = {
+        id: 'e-' + Date.now(),
+        title: document.getElementById('new-event-title').value.trim(),
+        category: document.getElementById('new-event-category-pills').dataset.selected || 'general',
+        completed: false,
+        event_time: document.getElementById('new-event-time').value ? document.getElementById('new-event-time').value + ':00' : null,
+        location: document.getElementById('new-event-location').value.trim()
+      };
+      
+      if (!targetSession.events) targetSession.events = [];
+      targetSession.events.push(newEvent);
+      
+      saveSessionsLocal();
+      syncAllToDB();
+      renderSessions();
+      renderCalendar();
+      closeModal('new-session-modal');
+      return;
+    }
+
     const title = document.getElementById('form-session-title').value.trim();
     const rank = parseInt(document.getElementById('form-session-rank').value) || 1;
     const date = document.getElementById('form-session-date').value;
@@ -616,6 +694,12 @@ const App = (function () {
     document.getElementById('form-session-date').value = session.allocated_date || '';
     document.getElementById('form-session-notes').value = session.notes || '';
     document.getElementById('session-modal-title').textContent = 'Edit Session';
+    
+    // Hide toggle since we are editing a session
+    document.getElementById('new-item-type-toggle').style.display = 'none';
+    const sessionRadio = document.querySelector('input[name="new_item_type"][value="session"]');
+    if (sessionRadio) sessionRadio.checked = true;
+    toggleNewItemType();
 
     openModal('new-session-modal');
   }
@@ -1014,6 +1098,8 @@ const App = (function () {
     moveRank,
     promptAllocateDate,
     openSessionEditor,
+    toggleNewItemType,
+    openNewItemModal,
     saveSessionForm,
     deleteSession,
     handleAddSubEvent,

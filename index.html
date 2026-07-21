@@ -26,7 +26,7 @@
       </div>
 
       <div class="header-actions">
-        <button class="btn btn-accent" onclick="App.openModal('new-session-modal')" title="New Session">
+        <button class="btn btn-accent" onclick="App.openNewItemModal()" title="Create New...">
           +
         </button>
         <button class="btn btn-icon" onclick="App.openModal('settings-modal')" title="Settings">
@@ -102,8 +102,8 @@
             </div>
 
             <div style="display: flex; gap: 10px; align-items: center;">
-              <button class="btn btn-sm btn-accent"
-                onclick="event.stopPropagation(); App.openModal('new-session-modal')" title="New Session">
+              <button class="btn btn-sm btn-accent" onclick="event.stopPropagation(); App.openNewItemModal()"
+                title="Create New...">
                 +
               </button>
               <span class="accordion-toggle" id="accordion-toggle-icon">▼</span>
@@ -144,41 +144,96 @@
       <form onsubmit="App.saveSessionForm(event)">
         <input type="hidden" id="form-session-id" value="" />
 
-        <div style="margin-bottom: 12px;">
+        <div id="new-item-type-toggle"
+          style="display: flex; gap: 8px; margin-bottom: 16px; background: var(--bg-color); padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
           <label
-            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session
-            Title (Grouping)</label>
-          <input type="text" id="form-session-title" class="form-control" style="width: 100%;"
-            placeholder="Group name..." required />
+            style="flex: 1; display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+            <input type="radio" name="new_item_type" value="session" checked onchange="App.toggleNewItemType()" /> Todo
+            Group
+          </label>
+          <label
+            style="flex: 1; display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 600;">
+            <input type="radio" name="new_item_type" value="event" onchange="App.toggleNewItemType()" /> Todo Event
+          </label>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
-          <div style="flex: 1;">
+        <div id="new-session-fields">
+          <div style="margin-bottom: 12px;">
             <label
-              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Priority
-              Rank (#)</label>
-            <input type="number" id="form-session-rank" class="form-control" style="width: 100%;" min="1" value="1"
-              required />
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session
+              Title (Grouping)</label>
+            <input type="text" id="form-session-title" class="form-control" style="width: 100%;"
+              placeholder="Group name..." />
           </div>
-          <div style="flex: 1;">
+
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Priority
+                Rank (#)</label>
+              <input type="number" id="form-session-rank" class="form-control" style="width: 100%;" min="1" value="1" />
+            </div>
+            <div style="flex: 1;">
+              <label
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Allocate
+                Date</label>
+              <input type="date" id="form-session-date" class="form-control" style="width: 100%;" />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
             <label
-              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Allocate
-              Date</label>
-            <input type="date" id="form-session-date" class="form-control" style="width: 100%;" />
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session
+              Notes (Optional)</label>
+            <textarea id="form-session-notes" class="form-control" style="width: 100%; height: 60px;"
+              placeholder="Add location details or general comments..."></textarea>
           </div>
         </div>
 
-        <div style="margin-bottom: 16px;">
-          <label
-            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Session
-            Notes (Optional)</label>
-          <textarea id="form-session-notes" class="form-control" style="width: 100%; height: 60px;"
-            placeholder="Add location details or general comments..."></textarea>
+        <div id="new-event-fields" style="display: none;">
+          <div style="margin-bottom: 12px;">
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Description</label>
+            <input type="text" id="new-event-title" class="form-control" style="width: 100%;"
+              placeholder="Event description..." />
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Category</label>
+            <div class="category-pills" id="new-event-category-pills" data-selected="general">
+              <!-- Dynamically populated in App.js -->
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Time</label>
+              <input type="time" id="new-event-time" class="form-control" style="width: 100%;" />
+            </div>
+            <div style="flex: 2;">
+              <label
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Target
+                Group</label>
+              <select id="new-event-target-session" class="form-control" style="width: 100%;">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Location
+              Link (Optional)</label>
+            <input type="text" id="new-event-location" class="form-control" style="width: 100%;"
+              placeholder="https://..." />
+          </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px;">
           <button type="button" class="btn" onclick="App.closeModal('new-session-modal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Session</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-new-item">Save Session</button>
         </div>
       </form>
     </div>
