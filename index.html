@@ -110,10 +110,14 @@
             </div>
           </div>
 
-          <div id="search-bar-wrapper">
+          <div id="search-bar-wrapper" style="display: flex; gap: 12px; align-items: center; width: 100%;">
             <input type="text" id="session-search-input" class="form-control"
-              style="font-size: 0.8rem; padding: 6px 10px; width: 100%; box-sizing: border-box;"
+              style="font-size: 0.8rem; padding: 6px 10px; flex: 1; box-sizing: border-box;"
               placeholder="Search sessions..." onclick="event.stopPropagation()" onkeyup="App.handleSearch(this.value)" />
+            <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 6px; color: var(--text-color); cursor: pointer;" onclick="event.stopPropagation()">
+              <input type="checkbox" id="show-completed-cb" onchange="App.toggleShowCompleted(this.checked)" />
+              Show completed
+            </label>
           </div>
 
         </div>

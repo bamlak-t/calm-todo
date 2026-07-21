@@ -18,6 +18,7 @@ const App = (function () {
   let currentPage = 1;
   const itemsPerPage = 10;
   let searchQuery = '';
+  let showCompleted = false;
 
   // Hardcoded Supabase Config (from User Request)
   const supabaseUrl = 'https://ipiuhnopkycycirspeky.supabase.co';
@@ -423,6 +424,12 @@ const App = (function () {
     renderSessions();
   }
 
+  function toggleShowCompleted(checked) {
+    showCompleted = checked;
+    currentPage = 1;
+    renderSessions();
+  }
+
   function changePage(delta) {
     currentPage += delta;
     renderSessions();
@@ -453,10 +460,22 @@ const App = (function () {
     // Sort by rank ascending (1 is highest priority)
     sessions.sort((a, b) => a.rank - b.rank);
 
-    const pendingCount = sessions.filter(s => !s.completed).length;
+    const pendingCount = sessions.filter(s => {
+      const isCompleted = s.completed || (s.events && s.events.length > 0 && s.events.every(e => e.completed));
+      return !isCompleted;
+    }).length;
     document.getElementById('pending-count-badge').textContent = `${pendingCount} Pending`;
 
     let filteredSessions = sessions;
+    
+    // Filter out completed sessions if not showing completed
+    if (!showCompleted) {
+      filteredSessions = filteredSessions.filter(s => {
+        const isCompleted = s.completed || (s.events && s.events.length > 0 && s.events.every(e => e.completed));
+        return !isCompleted;
+      });
+    }
+
     if (searchQuery) {
       filteredSessions = sessions.filter(s =>
         s.title.toLowerCase().includes(searchQuery) ||
@@ -1278,6 +1297,7 @@ const App = (function () {
     openModal,
     closeModal,
     toggleDarkMode,
-    openDayDetail
+    openDayDetail,
+    toggleShowCompleted
   };
 })();
