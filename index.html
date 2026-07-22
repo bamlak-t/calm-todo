@@ -212,7 +212,7 @@
             </div>
           </div>
 
-          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div class="date-inputs-row" style="display: flex; gap: 12px; margin-bottom: 12px;">
             <div style="flex: 1;">
               <label
                 style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Date</label>
@@ -223,14 +223,15 @@
                 style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Time</label>
               <input type="time" id="new-event-time" class="form-control" style="width: 100%;" />
             </div>
-            <div style="flex: 2;">
-              <label
-                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Target
-                Group</label>
-              <select id="new-event-target-session" class="form-control" style="width: 100%;">
-                <!-- Dynamically populated -->
-              </select>
-            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Target
+              Group</label>
+            <select id="new-event-target-session" class="form-control" style="width: 100%;">
+              <!-- Dynamically populated -->
+            </select>
           </div>
 
           <div style="margin-bottom: 16px;">

@@ -590,10 +590,12 @@ const App = (function () {
           <!-- Add Subevent Form -->
           <form onsubmit="App.handleAddSubEvent(event, '${session.id}')" class="add-subevent-form" style="align-items: center;">
             <input type="text" placeholder="Event description..." class="form-control" style="flex: 2; font-size: 0.8rem;" required />
-            <div class="pills-time-row">
+            <div class="pills-row">
               <div class="category-pills" data-selected="general">
                 ${Object.entries(CATEGORIES).map(([key, cat]) => `<button type="button" class="cat-pill ${key === 'general' ? 'active' : ''}" data-cat="${key}" style="--pill-color: ${cat.color}" onclick="App.selectCategoryPill(this)">${cat.name}</button>`).join('')}
               </div>
+            </div>
+            <div class="date-time-row">
               <input type="date" class="form-control date-input" style="font-size: 0.8rem;" 
                 min="${session.allocated_date || ''}" 
                 max="${session.end_date || session.allocated_date || ''}" 
