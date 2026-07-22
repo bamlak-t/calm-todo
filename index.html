@@ -106,12 +106,13 @@
             </div>
           </div>
 
-          <div id="search-bar-wrapper" style="display: flex; gap: 12px; align-items: center; width: 100%;">
+          <div id="search-bar-wrapper">
             <input type="text" id="session-search-input" class="form-control"
               style="font-size: 0.8rem; padding: 6px 10px; flex: 1; box-sizing: border-box;"
               placeholder="Search sessions..." onclick="event.stopPropagation()" onkeyup="App.handleSearch(this.value)" />
-            <label style="font-size: 0.75rem; display: flex; align-items: center; gap: 6px; color: var(--text-color); cursor: pointer;" onclick="event.stopPropagation()">
+            <label class="show-completed-toggle" onclick="event.stopPropagation()">
               <input type="checkbox" id="show-completed-cb" onchange="App.toggleShowCompleted(this.checked)" />
+              <span class="toggle-switch"></span>
               Show completed
             </label>
           </div>
@@ -347,24 +348,25 @@
           </div>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <div class="date-inputs-row" style="display: flex; gap: 12px; margin-bottom: 12px;">
           <div style="flex: 1;">
             <label
               style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Date</label>
-            <input type="date" id="edit-subevent-date" class="form-control" style="width: 100%;" required />
+            <input type="date" id="edit-subevent-date" class="form-control" style="width: 100%;" />
           </div>
           <div style="flex: 1;">
             <label
               style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Time</label>
             <input type="time" id="edit-subevent-time" class="form-control" style="width: 100%;" required />
           </div>
-          <div style="flex: 2;">
-            <label
-              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Location
-              Link</label>
-            <input type="text" id="edit-subevent-location" class="form-control" style="width: 100%;"
-              placeholder="https://..." />
-          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <label
+            style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Location
+            Link</label>
+          <input type="text" id="edit-subevent-location" class="form-control" style="width: 100%;"
+            placeholder="https://..." />
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px;">
