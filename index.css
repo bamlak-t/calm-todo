@@ -798,6 +798,10 @@ body.dark-mode .btn-primary {
     flex-direction: column !important;
   }
 
+  .date-inputs-row {
+    flex-direction: column !important;
+  }
+
   .calendar-settings-form>* {
     width: 100%;
     box-sizing: border-box;

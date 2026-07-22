@@ -168,7 +168,7 @@
               placeholder="Group name..." />
           </div>
 
-          <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div class="date-inputs-row" style="display: flex; gap: 12px; margin-bottom: 12px;">
             <div style="flex: 1;">
               <label
                 style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Priority
@@ -177,9 +177,13 @@
             </div>
             <div style="flex: 1;">
               <label
-                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Allocate
-                Date</label>
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Start Date</label>
               <input type="date" id="form-session-date" class="form-control" style="width: 100%;" />
+            </div>
+            <div style="flex: 1;">
+              <label
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">End Date</label>
+              <input type="date" id="form-session-end-date" class="form-control" style="width: 100%;" />
             </div>
           </div>
 
@@ -209,6 +213,11 @@
           </div>
 
           <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label
+                style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Date</label>
+              <input type="date" id="new-event-date" class="form-control" style="width: 100%;" />
+            </div>
             <div style="flex: 1;">
               <label
                 style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Time</label>
@@ -340,6 +349,11 @@
         <div style="display: flex; gap: 12px; margin-bottom: 16px;">
           <div style="flex: 1;">
             <label
+              style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Date</label>
+            <input type="date" id="edit-subevent-date" class="form-control" style="width: 100%;" required />
+          </div>
+          <div style="flex: 1;">
+            <label
               style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Time</label>
             <input type="time" id="edit-subevent-time" class="form-control" style="width: 100%;" required />
           </div>
@@ -376,8 +390,19 @@
             style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">Select
             Destination Session:</label>
           <div id="move-subevent-options"
-            style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto;">
+            style="display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; margin-bottom: 12px;">
             <!-- Dynamically populated -->
+          </div>
+          
+          <div id="move-create-own-dates" class="date-inputs-row" style="display: none; gap: 12px; margin-top: 12px;">
+            <div style="flex: 1;">
+              <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">Start Date</label>
+              <input type="date" id="move-create-own-start" class="form-control" style="width: 100%;" />
+            </div>
+            <div style="flex: 1;">
+              <label style="display: block; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; margin-bottom: 4px;">End Date</label>
+              <input type="date" id="move-create-own-end" class="form-control" style="width: 100%;" />
+            </div>
           </div>
         </div>
 

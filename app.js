@@ -141,6 +141,7 @@ const App = (function () {
           title: s.title,
           rank: s.rank,
           allocated_date: s.allocated_date,
+          end_date: s.end_date || null,
           completed: s.completed,
           notes: s.notes || '',
           events: (dbEvents || [])
@@ -149,6 +150,7 @@ const App = (function () {
               id: e.id,
               title: e.title,
               category: e.category || 'general',
+              event_date: e.event_date || null,
               event_time: e.event_time || '',
               location: e.location || '',
               completed: e.completed
@@ -204,6 +206,7 @@ const App = (function () {
           title: s.title,
           rank: s.rank,
           allocated_date: s.allocated_date || null,
+          end_date: s.end_date || null,
           completed: s.completed,
           notes: s.notes
         }).select().single();
@@ -224,6 +227,7 @@ const App = (function () {
               session_id: s.id,
               title: ev.title,
               category: ev.category,
+              event_date: ev.event_date || null,
               event_time: ev.event_time || null,
               location: ev.location || '',
               completed: ev.completed
@@ -236,6 +240,9 @@ const App = (function () {
         }
       }
       saveSessionsLocal(); // Save the new UUIDs locally
+      // Re-render to update any stale local IDs baked into the DOM (e.g. inline form handlers)
+      renderSessions();
+      renderCalendar();
     } catch (err) {
       console.warn('DB Sync error:', err);
     }
@@ -361,7 +368,13 @@ const App = (function () {
       eventsContainer.className = 'day-events';
 
       // Render allocated todo sessions & sub-events for this date
-      const allocatedSessions = sessions.filter(s => s.allocated_date === dateStr);
+      const allocatedSessions = sessions.filter(s => {
+        if (!s.allocated_date) return false;
+        const start = s.allocated_date;
+        const end = s.end_date || start;
+        return dateStr >= start && dateStr <= end;
+      });
+
       allocatedSessions.forEach(s => {
         const chip = document.createElement('div');
         chip.className = `event-chip ${s.completed ? 'completed' : ''}`;
@@ -373,9 +386,10 @@ const App = (function () {
         };
         eventsContainer.appendChild(chip);
 
-        // Also list individual sub-events inside the session
+        // Also list individual sub-events inside the session that belong to this date
         if (s.events) {
-          s.events.forEach(sub => {
+          const eventsOnDay = s.events.filter(sub => (sub.event_date || s.allocated_date) === dateStr);
+          eventsOnDay.forEach(sub => {
             const subChip = document.createElement('div');
             subChip.className = `event-chip ${sub.completed ? 'completed' : ''}`;
             subChip.style.background = CATEGORIES[sub.category]?.color || 'var(--accent-yellow)';
@@ -551,8 +565,8 @@ const App = (function () {
         return `
               <div class="subevent-item">
                 <div class="subevent-left">
-                  <input type="checkbox" class="subevent-checkbox" ${e.completed ? 'checked' : ''} 
-                    onchange="App.toggleSubEvent('${session.id}', '${e.id}')" />
+                  ${session.title !== 'Inbox (Unplanned)' ? `<input type="checkbox" class="subevent-checkbox" ${e.completed ? 'checked' : ''} 
+                    onchange="App.toggleSubEvent('${session.id}', '${e.id}')" />` : ''}
                   <span class="badge category-badge" style="background: ${catInfo.color}">
                     <span class="badge-full">${catInfo.icon ? catInfo.icon + ' ' : ''}${catInfo.name}</span>
                     <span class="badge-short">${catInfo.icon ? catInfo.icon + ' ' : ''}${catInfo.name.charAt(0)}</span>
@@ -580,7 +594,11 @@ const App = (function () {
               <div class="category-pills" data-selected="general">
                 ${Object.entries(CATEGORIES).map(([key, cat]) => `<button type="button" class="cat-pill ${key === 'general' ? 'active' : ''}" data-cat="${key}" style="--pill-color: ${cat.color}" onclick="App.selectCategoryPill(this)">${cat.name}</button>`).join('')}
               </div>
-              <input type="time" class="form-control" style="font-size: 0.8rem;" />
+              <input type="date" class="form-control date-input" style="font-size: 0.8rem;" 
+                min="${session.allocated_date || ''}" 
+                max="${session.end_date || session.allocated_date || ''}" 
+                value="${session.allocated_date || ''}" title="Date" />
+              <input type="time" class="form-control time-input" style="font-size: 0.8rem;" title="Time" />
             </div>
             <input type="text" placeholder="Location link..." class="form-control location-input" style="flex: 1; font-size: 0.8rem;" />
             <button type="submit" class="btn btn-sm btn-primary">+ Add</button>
@@ -651,9 +669,11 @@ const App = (function () {
     document.getElementById('form-session-title').value = '';
     document.getElementById('form-session-rank').value = '1';
     document.getElementById('form-session-date').value = '';
+    document.getElementById('form-session-end-date').value = '';
     document.getElementById('form-session-notes').value = '';
     
     document.getElementById('new-event-title').value = '';
+    document.getElementById('new-event-date').value = '';
     document.getElementById('new-event-time').value = '';
     document.getElementById('new-event-location').value = '';
     
@@ -695,6 +715,7 @@ const App = (function () {
         title: document.getElementById('new-event-title').value.trim(),
         category: document.getElementById('new-event-category-pills').dataset.selected || 'general',
         completed: false,
+        event_date: document.getElementById('new-event-date').value || (targetSession.allocated_date || formatDateIso(new Date())),
         event_time: document.getElementById('new-event-time').value ? document.getElementById('new-event-time').value + ':00' : '13:00:00',
         location: document.getElementById('new-event-location').value.trim()
       };
@@ -713,6 +734,7 @@ const App = (function () {
     const title = document.getElementById('form-session-title').value.trim();
     const rank = parseInt(document.getElementById('form-session-rank').value) || 1;
     const date = document.getElementById('form-session-date').value;
+    const endDate = document.getElementById('form-session-end-date').value || date;
     const notes = document.getElementById('form-session-notes').value.trim();
 
     if (!title) return;
@@ -724,6 +746,7 @@ const App = (function () {
         existing.title = title;
         existing.rank = rank;
         existing.allocated_date = date || null;
+        existing.end_date = endDate || null;
         existing.notes = notes;
       }
     } else {
@@ -733,6 +756,7 @@ const App = (function () {
         title: title,
         rank: rank,
         allocated_date: date || null,
+        end_date: endDate || null,
         completed: false,
         notes: notes,
         events: []
@@ -755,6 +779,7 @@ const App = (function () {
     document.getElementById('form-session-title').value = session.title;
     document.getElementById('form-session-rank').value = session.rank;
     document.getElementById('form-session-date').value = session.allocated_date || '';
+    document.getElementById('form-session-end-date').value = session.end_date || session.allocated_date || '';
     document.getElementById('form-session-notes').value = session.notes || '';
     document.getElementById('session-modal-title').textContent = 'Edit Session';
     
@@ -798,7 +823,8 @@ const App = (function () {
     const form = e.target;
     const titleInput = form.querySelector('input[type="text"]');
     const pillsContainer = form.querySelector('.category-pills');
-    const timeInput = form.querySelector('input[type="time"]');
+    const dateInput = form.querySelector('.date-input');
+    const timeInput = form.querySelector('.time-input');
     const locationInput = form.querySelector('.location-input');
 
     const title = titleInput.value.trim();
@@ -813,7 +839,8 @@ const App = (function () {
         id: 'e-' + Date.now(),
         title: title,
         category: category,
-        event_time: timeInput.value ? timeInput.value + ':00' : '13:00:00',
+        event_date: dateInput && dateInput.value ? dateInput.value : (session.allocated_date || formatDateIso(new Date())),
+        event_time: timeInput && timeInput.value ? timeInput.value + ':00' : '13:00:00',
         location: locationInput ? locationInput.value.trim() : '',
         completed: false
       });
@@ -847,6 +874,10 @@ const App = (function () {
     document.getElementById('edit-subevent-session-id').value = sessionId;
     document.getElementById('edit-subevent-id').value = eventId;
     document.getElementById('edit-subevent-title').value = sub.title;
+    const dateInputEl = document.getElementById('edit-subevent-date');
+    dateInputEl.value = sub.event_date || session.allocated_date || '';
+    dateInputEl.min = session.allocated_date || '';
+    dateInputEl.max = session.end_date || session.allocated_date || '';
     document.getElementById('edit-subevent-time').value = sub.event_time ? sub.event_time.substring(0, 5) : '';
     document.getElementById('edit-subevent-location').value = sub.location || '';
 
@@ -873,6 +904,7 @@ const App = (function () {
 
     sub.title = document.getElementById('edit-subevent-title').value.trim();
     sub.category = document.getElementById('edit-subevent-category').dataset.selected || 'general';
+    sub.event_date = document.getElementById('edit-subevent-date').value || (session.allocated_date || null);
     const timeVal = document.getElementById('edit-subevent-time').value;
     sub.event_time = timeVal ? timeVal + ':00' : null;
     sub.location = document.getElementById('edit-subevent-location').value.trim();
@@ -927,12 +959,26 @@ const App = (function () {
     document.getElementById('move-subevent-id').value = eventId;
 
     const optionsContainer = document.getElementById('move-subevent-options');
-    optionsContainer.innerHTML = targetSessions.map((s, idx) => `
+    const optionsHtml = targetSessions.map((s, idx) => `
       <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
-        <input type="radio" name="move-target" value="${s.id}" ${idx === 0 ? 'checked' : ''} />
+        <input type="radio" name="move-target" value="${s.id}" ${idx === 0 ? 'checked' : ''} onchange="document.getElementById('move-create-own-dates').style.display = 'none'" />
         <span style="font-weight: 500;">${escapeHtml(s.title)}</span>
       </label>
     `).join('');
+
+    const createOwnHtml = `
+      <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; margin-top: 8px;">
+        <input type="radio" name="move-target" value="CREATE_OWN" onchange="document.getElementById('move-create-own-dates').style.display = 'flex'" />
+        <span style="font-weight: 500;">Create own session</span>
+      </label>
+    `;
+
+    optionsContainer.innerHTML = optionsHtml + createOwnHtml;
+    
+    // Reset inputs
+    document.getElementById('move-create-own-dates').style.display = 'none';
+    document.getElementById('move-create-own-start').value = formatDateIso(new Date());
+    document.getElementById('move-create-own-end').value = formatDateIso(new Date());
 
     openModal('move-subevent-modal');
   }
@@ -946,12 +992,35 @@ const App = (function () {
     if (!targetSessionId) return;
 
     const session = sessions.find(s => s.id === sessionId);
-    const targetSession = sessions.find(s => s.id === targetSessionId);
-    if (!session || !targetSession) return;
-
+    if (!session) return;
+    
     const subEventIndex = session.events.findIndex(ev => ev.id === eventId);
     if (subEventIndex === -1) return;
     const subEvent = session.events[subEventIndex];
+
+    let targetSessionIdResolved = targetSessionId;
+
+    if (targetSessionId === 'CREATE_OWN') {
+      const startDate = document.getElementById('move-create-own-start').value || formatDateIso(new Date());
+      const endDate = document.getElementById('move-create-own-end').value || startDate;
+      
+      const newSession = {
+        id: 's-' + Date.now(),
+        title: subEvent.title,
+        rank: 1, // Default high rank for new "own" tasks
+        allocated_date: startDate,
+        end_date: endDate,
+        completed: false,
+        notes: '',
+        events: []
+      };
+      sessions.push(newSession);
+      targetSessionIdResolved = newSession.id;
+      subEvent.event_date = startDate; // Sync event date to the start date
+    }
+
+    const targetSession = sessions.find(s => s.id === targetSessionIdResolved);
+    if (!targetSession) return;
 
     // Remove from old, add to new
     session.events.splice(subEventIndex, 1);
@@ -966,11 +1035,11 @@ const App = (function () {
     // Update DB
     if (supabaseClient) {
       try {
-        const { error } = await supabaseClient
-          .from('session_events')
-          .update({ session_id: targetSession.id })
-          .eq('id', eventId);
-        if (error) console.error("Failed to move event in DB", error);
+        // If we created a new session, we need to push it first before we can assign events to it via Foreign Key constraint
+        // However, syncAllToDB() runs right after this, which syncs the entire DB anyway. 
+        // We can just rely on syncAllToDB to do the insert!
+        // Wait, the DB move here is for an existing event. If we move it to an unsynced session, it might fail.
+        // It's safer to just let syncAllToDB handle it entirely since we added a new session and moved the event.
       } catch (err) {
         console.error("Error moving event", err);
       }
@@ -1001,14 +1070,20 @@ const App = (function () {
 
     let html = '';
 
-    // Gather all events for this date (from allocated sessions)
-    const allocatedSessions = sessions.filter(s => s.allocated_date === dateStr);
+    // Gather all events for this date (from sessions whose date range includes this day)
+    const allocatedSessions = sessions.filter(s => {
+      if (!s.allocated_date) return false;
+      const start = s.allocated_date;
+      const end = s.end_date || start;
+      return dateStr >= start && dateStr <= end;
+    });
     const allTimelineEvents = [];
 
     allocatedSessions.forEach(s => {
-      // Add a session header entry
+      // Add events that specifically belong to this day
       if (s.events && s.events.length > 0) {
-        s.events.forEach(ev => {
+        const eventsOnDay = s.events.filter(ev => (ev.event_date || s.allocated_date) === dateStr);
+        eventsOnDay.forEach(ev => {
           const catInfo = CATEGORIES[ev.category] || CATEGORIES['general'];
           allTimelineEvents.push({
             time: ev.event_time ? ev.event_time.substring(0, 5) : '13:00',
@@ -1022,16 +1097,19 @@ const App = (function () {
           });
         });
       } else {
-        allTimelineEvents.push({
-          time: '00:00',
-          title: s.title,
-          group: 'Session',
-          category: '',
-          catColor: 'var(--border-color)',
-          location: '',
-          completed: s.completed,
-          source: 'internal'
-        });
+        // Session with no events — only show header on the start date
+        if (s.allocated_date === dateStr) {
+          allTimelineEvents.push({
+            time: '00:00',
+            title: s.title,
+            group: 'Session',
+            category: '',
+            catColor: 'var(--border-color)',
+            location: '',
+            completed: s.completed,
+            source: 'internal'
+          });
+        }
       }
     });
 
