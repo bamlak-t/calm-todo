@@ -578,10 +578,8 @@ const App = (function () {
                 </div>
                 <div style="display: flex; gap: 4px; align-items: center; flex-shrink: 0;">
                   <button class="btn btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="App.moveSubEvent('${session.id}', '${e.id}')" title="Move">➔</button>
-                  ${session.title !== 'Inbox (Unplanned)' ? `
-                    <button class="btn btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="App.editSubEvent('${session.id}', '${e.id}')" title="Edit">&#9998;</button>
-                    <button class="btn btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="App.deleteSubEvent('${session.id}', '${e.id}')" title="Delete">✕</button>
-                  ` : ''}
+                  <button class="btn btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="App.editSubEvent('${session.id}', '${e.id}')" title="Edit">&#9998;</button>
+                  <button class="btn btn-sm" style="padding: 2px 6px; font-size: 0.7rem;" onclick="App.deleteSubEvent('${session.id}', '${e.id}')" title="Delete">✕</button>
                 </div>
               </div>
             `}).join('')}
@@ -952,10 +950,6 @@ const App = (function () {
     const subEvent = session.events[subEventIndex];
 
     const targetSessions = sessions.filter(s => s.id !== sessionId);
-    if (targetSessions.length === 0) {
-      alert("No other sessions to move this event to.");
-      return;
-    }
 
     document.getElementById('move-subevent-session-id').value = sessionId;
     document.getElementById('move-subevent-id').value = eventId;
@@ -970,7 +964,7 @@ const App = (function () {
 
     const createOwnHtml = `
       <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; margin-top: 8px;">
-        <input type="radio" name="move-target" value="CREATE_OWN" onchange="document.getElementById('move-create-own-dates').style.display = 'flex'" />
+        <input type="radio" name="move-target" value="CREATE_OWN" ${targetSessions.length === 0 ? 'checked' : ''} onchange="document.getElementById('move-create-own-dates').style.display = 'flex'" />
         <span style="font-weight: 500;">Create own session</span>
       </label>
     `;
@@ -978,7 +972,7 @@ const App = (function () {
     optionsContainer.innerHTML = optionsHtml + createOwnHtml;
     
     // Reset inputs
-    document.getElementById('move-create-own-dates').style.display = 'none';
+    document.getElementById('move-create-own-dates').style.display = targetSessions.length === 0 ? 'flex' : 'none';
     document.getElementById('move-create-own-start').value = formatDateIso(new Date());
     document.getElementById('move-create-own-end').value = formatDateIso(new Date());
 
