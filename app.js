@@ -197,12 +197,35 @@ const App = (function () {
   async function syncAllToDB() {
     if (!supabaseClient) return;
     try {
-      for (const s of sessions) {
-        // If it's a locally generated ID (e.g. 's-12345...'), let Supabase generate a UUID
-        const isNewSession = typeof s.id === 'string' && s.id.startsWith('s-') && s.id.length < 30;
+      const existingSessionsPayload = [];
+      const newSessions = [];
 
-        const { data: upsertedSession, error: sessionErr } = await supabaseClient.from('todo_sessions').upsert({
-          id: isNewSession ? undefined : s.id,
+      for (const s of sessions) {
+        const isNewSession = typeof s.id === 'string' && s.id.startsWith('s-') && s.id.length < 30;
+        if (isNewSession) {
+          newSessions.push(s);
+        } else {
+          existingSessionsPayload.push({
+            id: s.id,
+            title: s.title,
+            rank: s.rank,
+            allocated_date: s.allocated_date || null,
+            end_date: s.end_date || null,
+            completed: s.completed,
+            notes: s.notes
+          });
+        }
+      }
+
+      // 1. Bulk upsert existing sessions in one call
+      if (existingSessionsPayload.length > 0) {
+        const { error } = await supabaseClient.from('todo_sessions').upsert(existingSessionsPayload);
+        if (error) throw error;
+      }
+
+      // 2. Insert new sessions one-by-one to get their UUIDs
+      for (const s of newSessions) {
+        const { data: upsertedSession, error } = await supabaseClient.from('todo_sessions').upsert({
           title: s.title,
           rank: s.rank,
           allocated_date: s.allocated_date || null,
@@ -210,20 +233,23 @@ const App = (function () {
           completed: s.completed,
           notes: s.notes
         }).select().single();
+        if (error) throw error;
+        if (upsertedSession) s.id = upsertedSession.id;
+      }
 
-        if (sessionErr) throw sessionErr;
+      // 3. Process events
+      const existingEventsPayload = [];
+      const newEvents = [];
 
-        // Update local id to the DB UUID to prevent future duplicates or deletion failures
-        if (isNewSession && upsertedSession) {
-          s.id = upsertedSession.id;
-        }
-
-        // Sync events for this session
-        if (s.events) {
-          for (const ev of s.events) {
-            const isNewEvent = typeof ev.id === 'string' && ev.id.startsWith('e-') && ev.id.length < 30;
-            const { data: upsertedEv } = await supabaseClient.from('session_events').upsert({
-              id: isNewEvent ? undefined : ev.id,
+      for (const s of sessions) {
+        if (!s.events) continue;
+        for (const ev of s.events) {
+          const isNewEvent = typeof ev.id === 'string' && ev.id.startsWith('e-') && ev.id.length < 30;
+          if (isNewEvent) {
+            newEvents.push({ localRef: ev, sessionId: s.id });
+          } else {
+            existingEventsPayload.push({
+              id: ev.id,
               session_id: s.id,
               title: ev.title,
               category: ev.category,
@@ -231,14 +257,32 @@ const App = (function () {
               event_time: ev.event_time || null,
               location: ev.location || '',
               completed: ev.completed
-            }).select().single();
-
-            if (isNewEvent && upsertedEv) {
-              ev.id = upsertedEv.id;
-            }
+            });
           }
         }
       }
+
+      // 4. Bulk upsert existing events in one call
+      if (existingEventsPayload.length > 0) {
+        const { error } = await supabaseClient.from('session_events').upsert(existingEventsPayload);
+        if (error) throw error;
+      }
+
+      // 5. Insert new events one-by-one to get their UUIDs
+      for (const ne of newEvents) {
+        const { data: upsertedEv, error } = await supabaseClient.from('session_events').upsert({
+          session_id: ne.sessionId,
+          title: ne.localRef.title,
+          category: ne.localRef.category,
+          event_date: ne.localRef.event_date || null,
+          event_time: ne.localRef.event_time || null,
+          location: ne.localRef.location || '',
+          completed: ne.localRef.completed
+        }).select().single();
+        if (error) throw error;
+        if (upsertedEv) ne.localRef.id = upsertedEv.id;
+      }
+
       saveSessionsLocal(); // Save the new UUIDs locally
       // Re-render to update any stale local IDs baked into the DOM (e.g. inline form handlers)
       renderSessions();
