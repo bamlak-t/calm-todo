@@ -2,10 +2,22 @@ import { create } from "zustand";
 
 export const useSessionStore = create((set) => ({
   sessions: [],
+  loading: false,
+  error: null,
 
   setSessions: (sessions) =>
     set({
       sessions,
+    }),
+
+  setLoading: (loading) =>
+    set({
+      loading,
+    }),
+
+  setError: (error) =>
+    set({
+      error,
     }),
 
   addSession: (session) =>
@@ -23,5 +35,10 @@ export const useSessionStore = create((set) => ({
             }
           : session,
       ),
+    })),
+
+  deleteSession: (id) =>
+    set((state) => ({
+      sessions: state.sessions.filter((session) => session.id !== id),
     })),
 }));

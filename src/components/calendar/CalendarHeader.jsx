@@ -11,15 +11,15 @@ export default function CalendarHeader() {
       <h2>{format(currentDate, "MMMM yyyy")}</h2>
 
       <div className="calendar-controls">
-        <button class="btn btn-sm" onClick={prevMonth}>
+        <button className="btn btn-sm" onClick={prevMonth}>
           Prev
         </button>
 
-        <button class="btn btn-sm" onClick={today}>
+        <button className="btn btn-sm" onClick={today}>
           Today
         </button>
 
-        <button class="btn btn-sm" onClick={nextMonth}>
+        <button className="btn btn-sm" onClick={nextMonth}>
           Next
         </button>
 

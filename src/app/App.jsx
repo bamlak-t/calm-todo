@@ -6,7 +6,7 @@ function App() {
     <>
       <Header />
 
-      <main class="main-container">
+      <main className="main-container">
         <Calendar />
       </main>
 
