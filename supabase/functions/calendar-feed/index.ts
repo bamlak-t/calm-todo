@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
 
       // Sub-events with specific times
       const subEvents = (events || []).filter(
-        (e) => e.session_id === session.id
+        (e) => e.session_id === session.id,
       );
       for (const sub of subEvents) {
         ics.push("BEGIN:VEVENT");
@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
         }
 
         ics.push(
-          `SUMMARY:${escapeICS(sub.title)} (${escapeICS(session.title)})`
+          `SUMMARY:${escapeICS(sub.title)} (${escapeICS(session.title)})`,
         );
         if (sub.location) {
           ics.push(`LOCATION:${escapeICS(sub.location)}`);
@@ -139,5 +139,9 @@ function formatICSTimestamp(d: Date): string {
 
 function escapeICS(str: string): string {
   if (!str) return "";
-  return str.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
+  return str
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
 }

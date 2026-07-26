@@ -1,0 +1,51 @@
+/* Base Header */
+.site-header {
+  background-color: var(--panel-bg);
+  border-bottom: var(--border-width) solid var(--border-color);
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-badge {
+  background: var(--accent-yellow);
+  color: var(--badge-text);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.25rem;
+  padding: 4px 12px;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: -0.5px;
+  transition: opacity 0.3s ease;
+}
+
+.logo-badge.faint {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

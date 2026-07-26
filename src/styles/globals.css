@@ -1,0 +1,186 @@
+/* CalmTodo Design System */
+:root {
+  --bg-color: #f8f9fa;
+  --panel-bg: #ffffff;
+  --text-color: #111827;
+  --text-muted: #6b7280;
+  --border-color: #000000;
+  --border-width: 2.5px;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+  --shadow-sm: 2px 2px 0px #000000;
+  --shadow-md: 3px 3px 0px #000000;
+  --shadow-lg: 5px 5px 0px #000000;
+
+  /* Light mode accents */
+  --accent-yellow: #fef08a;
+  --accent-blue: #bfdbfe;
+  --accent-green: #bbf7d0;
+  --accent-purple: #e9d5ff;
+  --accent-orange: #fed7aa;
+  --accent-rose: #fecdd3;
+  --badge-text: #000000;
+
+  --accent-primary: #111827;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+  --bg-color: #121214;
+  --panel-bg: #1e1e24;
+  --text-color: #f3f4f6;
+  --text-muted: #9ca3af;
+  --border-color: #4b5563;
+  /* Softer border for dark mode */
+  --shadow-sm: 2px 2px 0px #000000;
+  --shadow-md: 3px 3px 0px #000000;
+  --shadow-lg: 5px 5px 0px #000000;
+
+  /* Dark mode muted accents for better contrast with white/light text */
+  --accent-yellow: #854d0e;
+  --accent-blue: #1e3a8a;
+  --accent-green: #14532d;
+  --accent-purple: #581c87;
+  --accent-orange: #7c2d12;
+  --accent-rose: #881337;
+  --badge-text: #f3f4f6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+  padding-bottom: 90px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+.font-mono {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* Standard Buttons */
+.btn {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--radius-md);
+  background-color: var(--panel-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px transparent;
+}
+
+.btn-primary {
+  background-color: var(--text-color);
+  color: var(--panel-bg);
+}
+
+body.dark-mode .btn-primary {
+  background-color: var(--text-color);
+  color: var(--bg-color);
+}
+
+.btn-accent {
+  background-color: var(--accent-yellow);
+  color: var(--badge-text);
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+}
+
+.btn-icon {
+  padding: 6px 10px;
+}
+
+/* Badge System */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--panel-bg);
+  color: var(--text-color);
+}
+
+.badge-rank {
+  background-color: var(--accent-yellow);
+  color: var(--badge-text);
+}
+
+.badge-blue {
+  background-color: var(--accent-blue);
+  color: var(--badge-text);
+}
+
+.badge-green {
+  background-color: var(--accent-green);
+  color: var(--badge-text);
+}
+
+.badge-purple {
+  background-color: var(--accent-purple);
+  color: var(--badge-text);
+}
+
+.badge-orange {
+  background-color: var(--accent-orange);
+  color: var(--badge-text);
+}
+
+.badge-rose {
+  background-color: var(--accent-rose);
+  color: var(--badge-text);
+}
+
+/* Main Container */
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}

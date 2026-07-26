@@ -23,8 +23,9 @@
   --badge-text: #000000;
 
   --accent-primary: #111827;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
 }
 
 /* Dark Mode Variables */
@@ -63,7 +64,9 @@ body {
   padding-bottom: 90px;
   min-height: 100vh;
   overflow-x: hidden;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 /* Typography */
@@ -530,7 +533,7 @@ body.dark-mode .btn-primary {
 }
 
 .toggle-switch::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 2px;
   left: 2px;
@@ -542,11 +545,11 @@ body.dark-mode .btn-primary {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.show-completed-toggle input:checked+.toggle-switch {
+.show-completed-toggle input:checked + .toggle-switch {
   background: var(--accent-green);
 }
 
-.show-completed-toggle input:checked+.toggle-switch::after {
+.show-completed-toggle input:checked + .toggle-switch::after {
   transform: translateX(14px);
 }
 
@@ -859,7 +862,7 @@ body.dark-mode .btn-primary {
     flex-direction: column !important;
   }
 
-  .calendar-settings-form>* {
+  .calendar-settings-form > * {
     width: 100%;
     box-sizing: border-box;
   }
