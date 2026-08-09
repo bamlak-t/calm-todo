@@ -1,0 +1,90 @@
+.event-chip {
+  font-size: 0.72rem;
+  font-family: var(--font-sans);
+  padding: 3px 6px;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--accent-yellow);
+  color: var(--badge-text);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  /* Ensure text-overflow works */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.event-chip:hover {
+  background: var(--accent-orange);
+}
+
+.event-chip span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-chip.external-event {
+  background: var(--accent-green);
+  color: var(--badge-text);
+}
+
+.event-chip.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.event-modal {
+    margin: 16px
+}
+
+.event-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.event-modal__header-left {
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+}
+
+.event-modal__header-right {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.event-modal__list {
+    margin: 12px 0px;
+    padding: 8px 12px;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    gap: 8px;
+    display: flex;
+}
+
+.event-modal__subtle-text {
+    color: var(--text-muted);
+}
+
+.event-modal__badge {
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border-color);
+    padding: 4px 8px;
+    transform: translate(-2px, 7px);
+
+    &.fa-check {
+        background: var(--accent-green);
+    }
+
+    &.fa-clock {
+        background: var(--accent-gray);
+    }
+}

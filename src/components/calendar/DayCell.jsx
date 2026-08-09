@@ -1,4 +1,6 @@
 import { format, isSameMonth, isToday } from "date-fns";
+import EventChip from "../event/EventChip";
+import EventModal from "../event/EventModal";
 
 export default function DayCell({ day, sessions = [] }) {
   const dateString = format(day, "yyyy-MM-dd");
@@ -24,9 +26,9 @@ export default function DayCell({ day, sessions = [] }) {
 
       <div className="day-events">
         {allocatedSessions.map((session) => (
-          <div key={session.id} className="event-chip">
-            {session.title}
-          </div>
+          <>
+            <EventChip key={session.id} session={session} />
+          </>
         ))}
       </div>
     </div>

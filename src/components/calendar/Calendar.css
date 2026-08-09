@@ -151,38 +151,15 @@
   border-radius: 3px;
 }
 
-.event-chip {
-  font-size: 0.72rem;
-  font-family: var(--font-sans);
-  padding: 3px 6px;
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  background: var(--accent-yellow);
-  color: var(--badge-text);
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-  /* Ensure text-overflow works */
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.event-chip span {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.event-chip.external-event {
-  background: var(--accent-green);
-  color: var(--badge-text);
-}
-
-.event-chip.completed {
-  text-decoration: line-through;
-  opacity: 0.6;
+.event-modal__wrapper {
+    min-height: 50vh;
+    width: 70vw;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
 }
