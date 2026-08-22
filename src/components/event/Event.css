@@ -42,20 +42,20 @@
     margin: 16px
 }
 
-.event-modal__header {
+.event-modal__row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
 }
 
-.event-modal__header-left {
+.event-modal__row-left {
     display: flex;
     gap: 12px;
     align-items: baseline;
 }
 
-.event-modal__header-right {
+.event-modal__row-right {
     display: flex;
     gap: 6px;
     align-items: center;
@@ -70,6 +70,11 @@
     display: flex;
 }
 
+.event-modal__list-wrapper {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
 .event-modal__subtle-text {
     color: var(--text-muted);
 }
@@ -78,7 +83,7 @@
     border-radius: var(--radius-lg);
     border: 1.5px solid var(--border-color);
     padding: 4px 8px;
-    transform: translate(-2px, 7px);
+    transform: translate(-2px, 5px);
 
     &.fa-check {
         background: var(--accent-green);

@@ -58,6 +58,21 @@ export async function updateSession(id, updates) {
   return data;
 }
 
+export async function updateEvent(id, updates) {
+  const { data, error } = await supabase
+    .from("session_events")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 export async function deleteSession(id) {
   const { error } = await supabase.from("todo_sessions").delete().eq("id", id);
 

@@ -1,13 +1,11 @@
 import "./Event.css";
+import { useState } from "react";
+import { dateTimeConverter } from "../../utils/utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faClock, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-export default function EventModal({ session }) {
-    const modalCloseHandler = () => {
-        document.querySelector(".event-modal__wrapper").style.display = "none";
-    }
-    const dateTimeConverter = (event_time) => {
-        const date = new Date(`${session.allocated_date}T${event_time}Z`);
-        return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
-    }
+export default function EventModal({ session, onCompletionUpdate, onClose, onSelectionOpen, onEventDeletion }) {
+    const [isEditing, setIsEditing] = useState(false);
 
     const sortSessionEvents = (session_events) => {
         return session_events.sort((a, b) => {
@@ -19,25 +17,44 @@ export default function EventModal({ session }) {
 
     return (
         <div className="event-modal">
-            <div className="event-modal__header">
-                <div className="event-modal__header-left">
+            <div className="event-modal__row">
+                <div className="event-modal__row-left">
                     <h2>{session.title}</h2>
                     <span className="event-modal__subtle-text">{session.end_date}</span>
-                    {session.completed ? <i class="event-modal__badge fa-solid fa-check"></i> : <i class="event-modal__badge fa-regular fa-clock"></i>}
+                    <button className="btn-subtle" onClick={onCompletionUpdate}>
+                        <FontAwesomeIcon
+                            className="event-modal__badge"
+                            icon={session.completed ? faCheck : faClock}
+                        />
+                    </button>
                 </div>
-                <div className="event-modal__header-right">
-                    <button className="btn btn-icon"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button className="btn btn-icon" onClick={modalCloseHandler}><i class="fa-solid fa-x"></i></button>
+                <div className="event-modal__row-right">
+                    <button className="btn btn-icon" onClick={() => setIsEditing(!isEditing)}><i className="fa-solid fa-pen-to-square"></i></button>
+                    <button className="btn btn-icon" onClick={onClose}><i className="fa-solid fa-x"></i></button>
                 </div>
             </div>
             {sortSessionEvents(session.session_events || []).map((session_event) => 
             (
-                <div className="event-modal__list">
-                    <span>{session_event.title}</span>
-                    <span className="event-modal__subtle-text">{dateTimeConverter(session_event.event_time)}</span>
-                    {session_event.location && <a href={session_event.location} target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-link"></i></a>}
+                <div className="event-modal__row event-modal__list">
+                    <div className="event-modal__row-left">
+                        <span>{session_event.title}</span>
+                        <span className="event-modal__subtle-text">{dateTimeConverter(session_event.event_time, session.allocated_date)}</span>
+                        {session_event.location && <a href={session_event.location} target="_blank" rel="noopener noreferrer"><i className="fa-solid fa-link"></i></a>}
+                    </div>
+                    <div className="event-modal__row-right">
+                        {isEditing && (
+                            <button className="btn-subtle" onClick={() => onEventDeletion(session_event.id)}>
+                                <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                        )}
+                    </div>
                 </div>
             ))}
+            {isEditing && (
+                <button className="btn btn-icon" onClick={onSelectionOpen}>
+                    <FontAwesomeIcon icon={faPlus} />
+                </button>
+            )}
         </div>
     );
 }

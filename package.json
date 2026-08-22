@@ -11,6 +11,8 @@
     "formatter": "prettier --write ."
   },
   "dependencies": {
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
+    "@fortawesome/react-fontawesome": "^3.5.0",
     "@supabase/supabase-js": "^2.110.8",
     "date-fns": "^4.4.0",
     "react": "^19.2.7",

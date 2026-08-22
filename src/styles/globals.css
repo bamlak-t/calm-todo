@@ -80,6 +80,14 @@ h4,
   font-weight: 700;
 }
 
+a {
+  color: #fcb70c;
+}
+
+a:hover {
+  color: #fc7b0c;
+}
+
 /* Standard Buttons */
 .btn {
   font-family: var(--font-mono);
@@ -132,6 +140,17 @@ body.dark-mode .btn-primary {
 
 .btn-icon {
   padding: 6px 10px;
+}
+
+.btn-subtle {
+  background-color: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.btn-subtle:hover {
+  color: var(--text-color);
 }
 
 /* Badge System */
