@@ -166,3 +166,8 @@
 
     z-index: 1000;
 }
+
+.event-modal__wrapper-small {
+    width: 50vw;
+    min-height: 20vh;
+}

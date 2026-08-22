@@ -49,16 +49,45 @@
     margin-bottom: 32px;
 }
 
+.event-modal__row--small {
+    margin-bottom: 12px;
+}
+
 .event-modal__row-left {
     display: flex;
     gap: 12px;
     align-items: baseline;
+    flex: 1;
 }
 
 .event-modal__row-right {
     display: flex;
     gap: 6px;
     align-items: center;
+}
+
+.event-modal__input {
+    padding: 4px;
+    padding-left: 12px;
+    border: 1px solid var(--text-muted);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+}
+
+.event-modal__input--title {
+    max-width: 300px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.event-modal__input--wide {
+    width: 100%;
+}
+
+.event-modal__input--left {
+    margin-right: 8px;
 }
 
 .event-modal__list {
